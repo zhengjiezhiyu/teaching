@@ -1,0 +1,75 @@
+```c++
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+vector<int> mul_1 (vector<int> &A, int b){ // 高精度 * 低精度
+    vector<int> C;
+    int t = 0;
+    for(int i = 0;i<A.size();i++){
+        t += A[i] * b;
+        // 乘法相当于就是每个数位上的数字乘以一个数，在求和
+        C.push_back(t%10); // 处理进位
+        t = t/10;
+    }
+    while (t) { // 如果最高位发生了进位，处理进位
+        C.push_back(t%10);
+        t = t/10;
+    }
+    while(C.size() > 1 && C.back() == 0) C.pop_back();
+    // 处理 0
+    return C;
+}
+
+// 高精度 * 高精度
+vector<int> mul_2 (vector<int> &A, vector<int> &B){
+    vector<int> C (A.size()+B.size()+10, 0); // 开大点别溢出		
+    for(int i = 0;i<A.size();i++){
+        for(int j = 0;j<B.size();j++){
+            C[i+j] += A[i] * B[j];
+        }
+    }
+    // 处理进位
+    for(int i = 0;i<C.size();i++){
+        C[i+1] += C[i] / 10;
+        C[i] = C[i] % 10;
+    }
+    // 去掉前导0:
+    while (C.size() > 1 and C.back() == 0){
+        C.pop_back();
+    }
+    reverse(C.begin(), C.end()); // 倒序
+    return C;
+}
+
+int main(){
+    string num1;
+    int num2;
+    cin >> num1 >> num2;
+    vector<int> A;
+    for(int i =num1.size()-1;i>=0;i--){
+        A.push_back(num1[i]-'0'); // 字符串转整数。倒序
+    }
+    auto C = mul_1(A, num2);
+    for(int i = C.size()-1;i>=0;i--){
+        cout << C[i];
+    }
+    cout << endl;
+    string num3, num4;
+    cin >> num3 >> num4;
+    vector<int> A1, B1;
+    for(int i = num3.size()-1;i>=0;i--) {
+        A1.push_back(num3[i] - '0');
+    }
+    for(int i = num4.size()-1;i>=0;i--){
+        B1.push_back(num4[i]-'0');
+    }
+    auto D = mul_2(A1, B1);
+    for(int i = 0;i<D.size();i++){
+        cout << D[i];
+    }
+    return 0;
+}
+```
+
